@@ -10,6 +10,7 @@ const CategoriesService = require('./services/CategoriesService');
 const JobsService = require('./services/JobsService');
 const ApplicationsService = require('./services/ApplicationsService');
 const BookmarksService = require('./services/BookmarksService');
+const DocumentsService = require('./services/DocumentsService');
 
 // Controllers
 const UsersController = require('./controllers/UsersController');
@@ -20,6 +21,7 @@ const JobsController = require('./controllers/JobsController');
 const ApplicationsController = require('./controllers/ApplicationsController');
 const BookmarksController = require('./controllers/BookmarksController');
 const ProfileController = require('./controllers/ProfileController');
+const DocumentsController = require('./controllers/DocumentsController');
 
 // Routers
 const createUsersRouter = require('./routes/users');
@@ -30,6 +32,7 @@ const createJobsRouter = require('./routes/jobs');
 const createApplicationsRouter = require('./routes/applications');
 const createBookmarksRouter = require('./routes/bookmarks');
 const createProfileRouter = require('./routes/profile');
+const createDocumentsRouter = require('./routes/documents');
 
 const createApp = () => {
   const app = express();
@@ -44,6 +47,7 @@ const createApp = () => {
   const jobsService = new JobsService();
   const applicationsService = new ApplicationsService();
   const bookmarksService = new BookmarksService();
+  const documentsService = new DocumentsService();
 
   // Instantiate controllers
   const usersController = new UsersController(usersService);
@@ -62,12 +66,13 @@ const createApp = () => {
     applicationsService,
     bookmarksService
   );
+  const documentsController = new DocumentsController(documentsService);
 
   // Welcome route
   app.get('/', (req, res) => {
     res.status(200).json({
       status: 'success',
-      message: 'Selamat datang di OpenJob RESTful API V1',
+      message: 'Selamat datang di OpenJob RESTful API',
     });
   });
 
@@ -80,6 +85,7 @@ const createApp = () => {
   app.use('/applications', createApplicationsRouter(applicationsController));
   app.use('/bookmarks', createBookmarksRouter(bookmarksController));
   app.use('/profile', createProfileRouter(profileController));
+  app.use('/documents', createDocumentsRouter(documentsController));
 
   // 404 Route Handler
   app.use((req, res) => {
