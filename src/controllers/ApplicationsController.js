@@ -1,19 +1,31 @@
 class ApplicationsController {
-  constructor(applicationsService) {
+  constructor(applicationsService, cacheService) {
     this._applicationsService = applicationsService;
+    this._cacheService = cacheService;
 
     this.postApplicationHandler = this.postApplicationHandler.bind(this);
     this.getApplicationsHandler = this.getApplicationsHandler.bind(this);
     this.getApplicationByIdHandler = this.getApplicationByIdHandler.bind(this);
-    this.getApplicationsByUserIdHandler = this.getApplicationsByUserIdHandler.bind(this);
-    this.getApplicationsByJobIdHandler = this.getApplicationsByJobIdHandler.bind(this);
-    this.putApplicationStatusHandler = this.putApplicationStatusHandler.bind(this);
-    this.deleteApplicationByIdHandler = this.deleteApplicationByIdHandler.bind(this);
+    this.getApplicationsByUserIdHandler =
+      this.getApplicationsByUserIdHandler.bind(this);
+    this.getApplicationsByJobIdHandler =
+      this.getApplicationsByJobIdHandler.bind(this);
+    this.putApplicationStatusHandler =
+      this.putApplicationStatusHandler.bind(this);
+    this.deleteApplicationByIdHandler =
+      this.deleteApplicationByIdHandler.bind(this);
   }
 
   async postApplicationHandler(req, res, next) {
     try {
       const id = await this._applicationsService.addApplication(req.body);
+
+      // Invalidate list caches for user and job
+      await this._cacheService.delete([
+        `applications:user:${req.body.user_id}`,
+        `applications:job:${req.body.job_id}`,
+      ]);
+
       return res.status(201).json({
         status: 'success',
         message: 'Lamaran berhasil diajukan',
@@ -39,7 +51,24 @@ class ApplicationsController {
   async getApplicationByIdHandler(req, res, next) {
     try {
       const { id } = req.params;
-      const application = await this._applicationsService.getApplicationById(id);
+      const cacheKey = `applications:${id}`;
+
+      // Check cache first
+      const cached = await this._cacheService.get(cacheKey);
+      if (cached) {
+        res.setHeader('X-Data-Source', 'cache');
+        return res.status(200).json({
+          status: 'success',
+          data: JSON.parse(cached),
+        });
+      }
+
+      // If cache miss, fetch from database
+      const application =
+        await this._applicationsService.getApplicationById(id);
+      await this._cacheService.set(cacheKey, JSON.stringify(application), 3600);
+
+      res.setHeader('X-Data-Source', 'database');
       return res.status(200).json({
         status: 'success',
         data: application,
@@ -52,7 +81,28 @@ class ApplicationsController {
   async getApplicationsByUserIdHandler(req, res, next) {
     try {
       const { userId } = req.params;
-      const applications = await this._applicationsService.getApplicationsByUserId(userId);
+      const cacheKey = `applications:user:${userId}`;
+
+      // Check cache first
+      const cached = await this._cacheService.get(cacheKey);
+      if (cached) {
+        res.setHeader('X-Data-Source', 'cache');
+        return res.status(200).json({
+          status: 'success',
+          data: { applications: JSON.parse(cached) },
+        });
+      }
+
+      // If cache miss, fetch from database
+      const applications =
+        await this._applicationsService.getApplicationsByUserId(userId);
+      await this._cacheService.set(
+        cacheKey,
+        JSON.stringify(applications),
+        3600
+      );
+
+      res.setHeader('X-Data-Source', 'database');
       return res.status(200).json({
         status: 'success',
         data: { applications },
@@ -65,7 +115,28 @@ class ApplicationsController {
   async getApplicationsByJobIdHandler(req, res, next) {
     try {
       const { jobId } = req.params;
-      const applications = await this._applicationsService.getApplicationsByJobId(jobId);
+      const cacheKey = `applications:job:${jobId}`;
+
+      // Check cache first
+      const cached = await this._cacheService.get(cacheKey);
+      if (cached) {
+        res.setHeader('X-Data-Source', 'cache');
+        return res.status(200).json({
+          status: 'success',
+          data: { applications: JSON.parse(cached) },
+        });
+      }
+
+      // If cache miss, fetch from database
+      const applications =
+        await this._applicationsService.getApplicationsByJobId(jobId);
+      await this._cacheService.set(
+        cacheKey,
+        JSON.stringify(applications),
+        3600
+      );
+
+      res.setHeader('X-Data-Source', 'database');
       return res.status(200).json({
         status: 'success',
         data: { applications },
@@ -78,7 +149,18 @@ class ApplicationsController {
   async putApplicationStatusHandler(req, res, next) {
     try {
       const { id } = req.params;
-      await this._applicationsService.editApplicationStatusById(id, req.body);
+      const updated = await this._applicationsService.editApplicationStatusById(
+        id,
+        req.body
+      );
+
+      // Invalidate detail cache and both list caches
+      await this._cacheService.delete([
+        `applications:${id}`,
+        `applications:user:${updated.user_id}`,
+        `applications:job:${updated.job_id}`,
+      ]);
+
       return res.status(200).json({
         status: 'success',
         message: 'Status lamaran berhasil diperbarui',
@@ -91,7 +173,15 @@ class ApplicationsController {
   async deleteApplicationByIdHandler(req, res, next) {
     try {
       const { id } = req.params;
-      await this._applicationsService.deleteApplicationById(id);
+      const deleted = await this._applicationsService.deleteApplicationById(id);
+
+      // Invalidate detail cache and both list caches
+      await this._cacheService.delete([
+        `applications:${id}`,
+        `applications:user:${deleted.user_id}`,
+        `applications:job:${deleted.job_id}`,
+      ]);
+
       return res.status(200).json({
         status: 'success',
         message: 'Lamaran berhasil dihapus',

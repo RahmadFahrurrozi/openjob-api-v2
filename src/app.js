@@ -11,6 +11,7 @@ const JobsService = require('./services/JobsService');
 const ApplicationsService = require('./services/ApplicationsService');
 const BookmarksService = require('./services/BookmarksService');
 const DocumentsService = require('./services/DocumentsService');
+const CacheService = require('./services/CacheService');
 
 // Controllers
 const UsersController = require('./controllers/UsersController');
@@ -45,22 +46,33 @@ const createApp = () => {
   const companiesService = new CompaniesService();
   const categoriesService = new CategoriesService();
   const jobsService = new JobsService();
+  const cacheService = new CacheService();
   const applicationsService = new ApplicationsService();
   const bookmarksService = new BookmarksService();
   const documentsService = new DocumentsService();
 
   // Instantiate controllers
-  const usersController = new UsersController(usersService);
+  // Instantiate controllers
+  const usersController = new UsersController(usersService, cacheService);
   const authenticationsController = new AuthenticationsController(
     authenticationsService,
     usersService,
     TokenManager
   );
-  const companiesController = new CompaniesController(companiesService);
+  const companiesController = new CompaniesController(
+    companiesService,
+    cacheService
+  );
   const categoriesController = new CategoriesController(categoriesService);
-  const bookmarksController = new BookmarksController(bookmarksService);
+  const bookmarksController = new BookmarksController(
+    bookmarksService,
+    cacheService
+  );
   const jobsController = new JobsController(jobsService);
-  const applicationsController = new ApplicationsController(applicationsService);
+  const applicationsController = new ApplicationsController(
+    applicationsService,
+    cacheService
+  );
   const profileController = new ProfileController(
     usersService,
     applicationsService,
@@ -78,7 +90,10 @@ const createApp = () => {
 
   // Mount routes
   app.use('/users', createUsersRouter(usersController));
-  app.use('/authentications', createAuthenticationsRouter(authenticationsController));
+  app.use(
+    '/authentications',
+    createAuthenticationsRouter(authenticationsController)
+  );
   app.use('/companies', createCompaniesRouter(companiesController));
   app.use('/categories', createCategoriesRouter(categoriesController));
   app.use('/jobs', createJobsRouter(jobsController, bookmarksController));

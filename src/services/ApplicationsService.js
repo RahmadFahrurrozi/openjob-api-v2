@@ -6,13 +6,17 @@ const NotFoundError = require('../exceptions/NotFoundError');
 class ApplicationsService {
   async addApplication({ user_id, job_id, status = 'pending' }) {
     // Verify user exists
-    const userCheck = await pool.query('SELECT id FROM users WHERE id = $1', [user_id]);
+    const userCheck = await pool.query('SELECT id FROM users WHERE id = $1', [
+      user_id,
+    ]);
     if (!userCheck.rows.length) {
       throw new NotFoundError('User tidak ditemukan');
     }
 
     // Verify job exists
-    const jobCheck = await pool.query('SELECT id FROM jobs WHERE id = $1', [job_id]);
+    const jobCheck = await pool.query('SELECT id FROM jobs WHERE id = $1', [
+      job_id,
+    ]);
     if (!jobCheck.rows.length) {
       throw new NotFoundError('Job tidak ditemukan');
     }
@@ -100,20 +104,24 @@ class ApplicationsService {
 
   async editApplicationStatusById(id, { status }) {
     const query = {
-      text: 'UPDATE applications SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id',
+      text: 'UPDATE applications SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id, user_id, job_id',
       values: [status, id],
     };
 
     const result = await pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Gagal memperbarui status lamaran. Id tidak ditemukan');
+      throw new NotFoundError(
+        'Gagal memperbarui status lamaran. Id tidak ditemukan'
+      );
     }
+
+    return result.rows[0];
   }
 
   async deleteApplicationById(id) {
     const query = {
-      text: 'DELETE FROM applications WHERE id = $1 RETURNING id',
+      text: 'DELETE FROM applications WHERE id = $1 RETURNING id, user_id, job_id',
       values: [id],
     };
 
@@ -122,6 +130,8 @@ class ApplicationsService {
     if (!result.rows.length) {
       throw new NotFoundError('Lamaran gagal dihapus. Id tidak ditemukan');
     }
+
+    return result.rows[0];
   }
 }
 

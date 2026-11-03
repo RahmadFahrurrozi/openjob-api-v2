@@ -1,6 +1,7 @@
 class CompaniesController {
-  constructor(companiesService) {
+  constructor(companiesService, cacheService) {
     this._companiesService = companiesService;
+    this._cacheService = cacheService;
 
     this.postCompanyHandler = this.postCompanyHandler.bind(this);
     this.getCompaniesHandler = this.getCompaniesHandler.bind(this);
@@ -12,6 +13,8 @@ class CompaniesController {
   async postCompanyHandler(req, res, next) {
     try {
       const id = await this._companiesService.addCompany(req.body);
+      await this._cacheService.delete(`companies:${id}`);
+
       return res.status(201).json({
         status: 'success',
         message: 'Perusahaan berhasil ditambahkan',
@@ -37,7 +40,23 @@ class CompaniesController {
   async getCompanyByIdHandler(req, res, next) {
     try {
       const { id } = req.params;
+      const cacheKey = `companies:${id}`;
+
+      // Check cache first
+      const cached = await this._cacheService.get(cacheKey);
+      if (cached) {
+        res.setHeader('X-Data-Source', 'cache');
+        return res.status(200).json({
+          status: 'success',
+          data: JSON.parse(cached),
+        });
+      }
+
+      // If cache miss, fetch from database
       const company = await this._companiesService.getCompanyById(id);
+      await this._cacheService.set(cacheKey, JSON.stringify(company), 3600);
+
+      res.setHeader('X-Data-Source', 'database');
       return res.status(200).json({
         status: 'success',
         data: company,
@@ -51,6 +70,10 @@ class CompaniesController {
     try {
       const { id } = req.params;
       await this._companiesService.editCompanyById(id, req.body);
+
+      // Invalidate cache
+      await this._cacheService.delete(`companies:${id}`);
+
       return res.status(200).json({
         status: 'success',
         message: 'Perusahaan berhasil diperbarui',
@@ -64,6 +87,10 @@ class CompaniesController {
     try {
       const { id } = req.params;
       await this._companiesService.deleteCompanyById(id);
+
+      // Invalidate cache
+      await this._cacheService.delete(`companies:${id}`);
+
       return res.status(200).json({
         status: 'success',
         message: 'Perusahaan berhasil dihapus',

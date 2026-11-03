@@ -1,6 +1,7 @@
 class UsersController {
-  constructor(usersService) {
+  constructor(usersService, cacheService) {
     this._usersService = usersService;
+    this._cacheService = cacheService;
 
     this.postUserHandler = this.postUserHandler.bind(this);
     this.getUserByIdHandler = this.getUserByIdHandler.bind(this);
@@ -22,15 +23,33 @@ class UsersController {
   async getUserByIdHandler(req, res, next) {
     try {
       const { id } = req.params;
+      const cacheKey = `users:${id}`;
+
+      // Check cache first
+      const cached = await this._cacheService.get(cacheKey);
+      if (cached) {
+        res.setHeader('X-Data-Source', 'cache');
+        return res.status(200).json({
+          status: 'success',
+          data: JSON.parse(cached),
+        });
+      }
+
+      // If cache miss, fetch from database
       const user = await this._usersService.getUserById(id);
+      const userData = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+
+      await this._cacheService.set(cacheKey, JSON.stringify(userData), 3600);
+
+      res.setHeader('X-Data-Source', 'database');
       return res.status(200).json({
         status: 'success',
-        data: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+        data: userData,
       });
     } catch (error) {
       next(error);

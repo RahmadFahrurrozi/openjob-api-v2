@@ -6,17 +6,17 @@ OpenJob RESTful API is a production-grade backend service built with Node.js and
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before setting up the project on your laptop, ensure you have the following installed:
 
-1. **Node.js** (v22.x LTS or higher) & **npm**
+1. **Node.js** (v22.x LTS or higher) and **npm**
 2. **Git**
 3. **Docker Desktop** (must be running for PostgreSQL, Redis, and RabbitMQ)
 
 ---
 
-## 🚀 Laptop Setup Guide (From Clone to Running)
+## Laptop Setup Guide (From Clone to Running)
 
 Follow these exact steps when pulling or cloning this repository on your laptop:
 
@@ -79,7 +79,7 @@ The server will be accessible at `http://localhost:3000`.
 
 ---
 
-## 🛠️ Available NPM Scripts
+## Available NPM Scripts
 
 | Command | Description |
 | :--- | :--- |
@@ -95,7 +95,7 @@ The server will be accessible at `http://localhost:3000`.
 
 ---
 
-## ⚙️ Environment Variables Reference
+## Environment Variables Reference
 
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
@@ -121,7 +121,7 @@ The server will be accessible at `http://localhost:3000`.
 
 ---
 
-## 📦 Container Services Management
+## Container Services Management
 
 * **Stop containers without losing database data:**
   ```bash
@@ -137,11 +137,10 @@ The server will be accessible at `http://localhost:3000`.
 
 ---
 
-## 🧪 Testing with Postman & Newman
+## Testing with Postman and Newman
 
 Import the Postman Collection and Environment located in `OpenJob RESTful API V2 Test/`:
 1. `OpenJob API.postman_environment.json`
 2. `[271] OpenJob API Test V2.postman_collection.json`
 
 Ensure your environment active target is set to **OpenJob API** and execute required test folders.
-
