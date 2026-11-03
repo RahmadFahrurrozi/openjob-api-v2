@@ -5,7 +5,6 @@ const NotFoundError = require('../exceptions/NotFoundError');
 
 class BookmarksService {
   async addBookmark(userId, jobId) {
-    // Check if job exists
     const jobCheck = await pool.query('SELECT id FROM jobs WHERE id = $1', [
       jobId,
     ]);
@@ -13,7 +12,6 @@ class BookmarksService {
       throw new NotFoundError('Job tidak ditemukan');
     }
 
-    // Check if already bookmarked
     const existing = await pool.query(
       'SELECT id FROM bookmarks WHERE user_id = $1 AND job_id = $2',
       [userId, jobId]

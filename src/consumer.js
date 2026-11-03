@@ -13,7 +13,6 @@ async function init() {
     process.env.AMQP_URL || `amqp://${user}:${password}@${host}:${port}`;
   const queue = 'openjob:applications';
 
-  // Configure Nodemailer transporter using environment variables
   const transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST || 'smtp.mailtrap.io',
     port: Number(process.env.MAIL_PORT) || 2525,
@@ -46,7 +45,6 @@ async function init() {
 
       console.log(`Processing application: ${application_id}`);
 
-      // Query application, applicant, job, and job owner from database
       const query = {
         text: `
           SELECT 
@@ -80,7 +78,6 @@ async function init() {
       let ownerEmail = row.owner_email;
       let ownerName = row.owner_name;
 
-      // Dynamic fallback: query database for job owner or employer if not directly linked
       if (!ownerEmail) {
         const ownerFallback = await pool.query(`
           SELECT email, name FROM users 
@@ -100,7 +97,6 @@ async function init() {
         return;
       }
 
-      // Format email notification
       const mailOptions = {
         from: '"OpenJob Notifications" <no-reply@openjob.com>',
         to: ownerEmail,
@@ -132,7 +128,6 @@ async function init() {
         );
       }
 
-      // Acknowledge the message once processed
       channel.ack(message);
     } catch (err) {
       console.error('Error processing RabbitMQ message:', err.message);

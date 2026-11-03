@@ -41,7 +41,6 @@ class ProducerService {
       await channel.assertQueue(queue, { durable: true });
       channel.sendToQueue(queue, Buffer.from(message));
     } catch (error) {
-      // Reset connection on failure so subsequent calls can retry
       this._connection = null;
       this._channel = null;
       console.error('Failed to send message to RabbitMQ:', error.message);

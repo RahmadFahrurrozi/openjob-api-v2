@@ -2,7 +2,6 @@ const express = require('express');
 const errorHandler = require('./middlewares/errorHandler');
 const TokenManager = require('./tokenize/TokenManager');
 
-// Services
 const UsersService = require('./services/UsersService');
 const AuthenticationsService = require('./services/AuthenticationsService');
 const CompaniesService = require('./services/CompaniesService');
@@ -14,7 +13,6 @@ const DocumentsService = require('./services/DocumentsService');
 const CacheService = require('./services/CacheService');
 const ProducerService = require('./services/ProducerService');
 
-// Controllers
 const UsersController = require('./controllers/UsersController');
 const AuthenticationsController = require('./controllers/AuthenticationsController');
 const CompaniesController = require('./controllers/CompaniesController');
@@ -25,7 +23,6 @@ const BookmarksController = require('./controllers/BookmarksController');
 const ProfileController = require('./controllers/ProfileController');
 const DocumentsController = require('./controllers/DocumentsController');
 
-// Routers
 const createUsersRouter = require('./routes/users');
 const createAuthenticationsRouter = require('./routes/authentications');
 const createCompaniesRouter = require('./routes/companies');
@@ -41,7 +38,6 @@ const createApp = () => {
 
   app.use(express.json());
 
-  // Instantiate services
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const companiesService = new CompaniesService();
@@ -53,7 +49,6 @@ const createApp = () => {
   const documentsService = new DocumentsService();
   const producerService = new ProducerService();
 
-  // Instantiate controllers
   const usersController = new UsersController(usersService, cacheService);
   const authenticationsController = new AuthenticationsController(
     authenticationsService,
@@ -82,7 +77,6 @@ const createApp = () => {
   );
   const documentsController = new DocumentsController(documentsService);
 
-  // Welcome route
   app.get('/', (req, res) => {
     res.status(200).json({
       status: 'success',
@@ -90,7 +84,6 @@ const createApp = () => {
     });
   });
 
-  // Mount routes
   app.use('/users', createUsersRouter(usersController));
   app.use(
     '/authentications',
@@ -104,7 +97,6 @@ const createApp = () => {
   app.use('/profile', createProfileRouter(profileController));
   app.use('/documents', createDocumentsRouter(documentsController));
 
-  // 404 Route Handler
   app.use((req, res) => {
     res.status(404).json({
       status: 'failed',
@@ -112,7 +104,6 @@ const createApp = () => {
     });
   });
 
-  // Centralized Error Handling Middleware
   app.use(errorHandler);
 
   return app;

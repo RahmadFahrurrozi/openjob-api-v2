@@ -5,7 +5,6 @@ const NotFoundError = require('../exceptions/NotFoundError');
 
 class ApplicationsService {
   async addApplication({ user_id, job_id, status = 'pending' }) {
-    // Verify user exists
     const userCheck = await pool.query('SELECT id FROM users WHERE id = $1', [
       user_id,
     ]);
@@ -13,7 +12,6 @@ class ApplicationsService {
       throw new NotFoundError('User tidak ditemukan');
     }
 
-    // Verify job exists
     const jobCheck = await pool.query('SELECT id FROM jobs WHERE id = $1', [
       job_id,
     ]);
@@ -21,7 +19,6 @@ class ApplicationsService {
       throw new NotFoundError('Job tidak ditemukan');
     }
 
-    // Check for duplicate application
     const existing = await pool.query(
       'SELECT id FROM applications WHERE user_id = $1 AND job_id = $2',
       [user_id, job_id]

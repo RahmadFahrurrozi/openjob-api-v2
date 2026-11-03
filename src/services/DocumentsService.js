@@ -6,9 +6,6 @@ const InvariantError = require('../exceptions/InvariantError');
 const NotFoundError = require('../exceptions/NotFoundError');
 
 class DocumentsService {
-  /**
-   * Save uploaded document metadata into the database.
-   */
   async addDocument({ userId, filename, originalName, size }) {
     const id = `document-${nanoid(16)}`;
 
@@ -31,9 +28,6 @@ class DocumentsService {
     };
   }
 
-  /**
-   * Retrieve all uploaded documents.
-   */
   async getDocuments() {
     const result = await pool.query(
       'SELECT id, user_id, filename, original_name, size, created_at, updated_at FROM documents ORDER BY created_at DESC'
@@ -41,9 +35,6 @@ class DocumentsService {
     return result.rows;
   }
 
-  /**
-   * Retrieve single document metadata by id.
-   */
   async getDocumentById(id) {
     const query = {
       text: 'SELECT id, user_id, filename, original_name, size FROM documents WHERE id = $1',
@@ -59,9 +50,6 @@ class DocumentsService {
     return result.rows[0];
   }
 
-  /**
-   * Delete document metadata from database and unlink physical file from disk.
-   */
   async deleteDocumentById(id) {
     const document = await this.getDocumentById(id);
 
@@ -76,7 +64,6 @@ class DocumentsService {
       throw new NotFoundError('Dokumen gagal dihapus. Id tidak ditemukan');
     }
 
-    // Delete physical file from disk
     const filePath = path.resolve(
       __dirname,
       '../../uploads/documents',

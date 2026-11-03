@@ -25,7 +25,6 @@ class UsersController {
       const { id } = req.params;
       const cacheKey = `users:${id}`;
 
-      // Check cache first
       const cached = await this._cacheService.get(cacheKey);
       if (cached) {
         res.setHeader('X-Data-Source', 'cache');
@@ -35,7 +34,6 @@ class UsersController {
         });
       }
 
-      // If cache miss, fetch from database
       const user = await this._usersService.getUserById(id);
       const userData = {
         id: user.id,

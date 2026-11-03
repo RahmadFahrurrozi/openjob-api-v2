@@ -9,7 +9,6 @@ const {
 const createApplicationsRouter = (applicationsController) => {
   const router = express.Router();
 
-  // All application endpoints are protected
   router.use(authMiddleware);
 
   router.post(
@@ -19,7 +18,6 @@ const createApplicationsRouter = (applicationsController) => {
   );
   router.get('/', applicationsController.getApplicationsHandler);
 
-  // Sub-routes before /:id
   router.get(
     '/user/:userId',
     applicationsController.getApplicationsByUserIdHandler

@@ -15,7 +15,6 @@ class BookmarksController {
       const { jobId } = req.params;
       const id = await this._bookmarksService.addBookmark(userId, jobId);
 
-      // Invalidate user bookmarks cache
       await this._cacheService.delete(`bookmarks:user:${userId}`);
 
       return res.status(201).json({
@@ -47,7 +46,6 @@ class BookmarksController {
       const { jobId } = req.params;
       await this._bookmarksService.deleteBookmark(userId, jobId);
 
-      // Invalidate user bookmarks cache
       await this._cacheService.delete(`bookmarks:user:${userId}`);
 
       return res.status(200).json({
@@ -64,7 +62,6 @@ class BookmarksController {
       const { id: userId } = req.user;
       const cacheKey = `bookmarks:user:${userId}`;
 
-      // Check cache first
       const cached = await this._cacheService.get(cacheKey);
       if (cached) {
         res.setHeader('X-Data-Source', 'cache');
@@ -74,7 +71,6 @@ class BookmarksController {
         });
       }
 
-      // If cache miss, fetch from database
       const bookmarks =
         await this._bookmarksService.getBookmarksByUserId(userId);
       await this._cacheService.set(cacheKey, JSON.stringify(bookmarks), 3600);

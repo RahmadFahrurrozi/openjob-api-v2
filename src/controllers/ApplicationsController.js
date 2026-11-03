@@ -23,7 +23,6 @@ class ApplicationsController {
         req.body
       );
 
-      // Publish notification message to RabbitMQ asynchronously
       if (this._producerService) {
         await this._producerService.sendMessage(
           'openjob:applications',
@@ -31,7 +30,6 @@ class ApplicationsController {
         );
       }
 
-      // Invalidate list caches for user and job
       await this._cacheService.delete([
         `applications:user:${req.body.user_id}`,
         `applications:job:${req.body.job_id}`,
@@ -69,7 +67,6 @@ class ApplicationsController {
       const { id } = req.params;
       const cacheKey = `applications:${id}`;
 
-      // Check cache first
       const cached = await this._cacheService.get(cacheKey);
       if (cached) {
         res.setHeader('X-Data-Source', 'cache');
@@ -79,7 +76,6 @@ class ApplicationsController {
         });
       }
 
-      // If cache miss, fetch from database
       const application =
         await this._applicationsService.getApplicationById(id);
       await this._cacheService.set(cacheKey, JSON.stringify(application), 3600);
@@ -99,7 +95,6 @@ class ApplicationsController {
       const { userId } = req.params;
       const cacheKey = `applications:user:${userId}`;
 
-      // Check cache first
       const cached = await this._cacheService.get(cacheKey);
       if (cached) {
         res.setHeader('X-Data-Source', 'cache');
@@ -109,7 +104,6 @@ class ApplicationsController {
         });
       }
 
-      // If cache miss, fetch from database
       const applications =
         await this._applicationsService.getApplicationsByUserId(userId);
       await this._cacheService.set(
@@ -133,7 +127,6 @@ class ApplicationsController {
       const { jobId } = req.params;
       const cacheKey = `applications:job:${jobId}`;
 
-      // Check cache first
       const cached = await this._cacheService.get(cacheKey);
       if (cached) {
         res.setHeader('X-Data-Source', 'cache');
@@ -143,7 +136,6 @@ class ApplicationsController {
         });
       }
 
-      // If cache miss, fetch from database
       const applications =
         await this._applicationsService.getApplicationsByJobId(jobId);
       await this._cacheService.set(
@@ -170,7 +162,6 @@ class ApplicationsController {
         req.body
       );
 
-      // Invalidate detail cache and both list caches
       await this._cacheService.delete([
         `applications:${id}`,
         `applications:user:${updated.user_id}`,
@@ -191,7 +182,6 @@ class ApplicationsController {
       const { id } = req.params;
       const deleted = await this._applicationsService.deleteApplicationById(id);
 
-      // Invalidate detail cache and both list caches
       await this._cacheService.delete([
         `applications:${id}`,
         `applications:user:${deleted.user_id}`,

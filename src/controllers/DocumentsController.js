@@ -12,9 +12,6 @@ class DocumentsController {
     this.deleteDocumentByIdHandler = this.deleteDocumentByIdHandler.bind(this);
   }
 
-  /**
-   * Handle document upload request (POST /documents).
-   */
   async postDocumentHandler(req, res, next) {
     try {
       const { id: userId } = req.user;
@@ -37,9 +34,6 @@ class DocumentsController {
     }
   }
 
-  /**
-   * Handle retrieve all documents request (GET /documents).
-   */
   async getDocumentsHandler(req, res, next) {
     try {
       const documents = await this._documentsService.getDocuments();
@@ -55,10 +49,6 @@ class DocumentsController {
     }
   }
 
-  /**
-   * Handle view/download document by ID (GET /documents/:id).
-   * Delivers physical PDF file with required Content-Type and Content-Disposition headers.
-   */
   async getDocumentByIdHandler(req, res, next) {
     try {
       const { id } = req.params;
@@ -86,9 +76,6 @@ class DocumentsController {
     }
   }
 
-  /**
-   * Handle delete document request (DELETE /documents/:id).
-   */
   async deleteDocumentByIdHandler(req, res, next) {
     try {
       const { id } = req.params;

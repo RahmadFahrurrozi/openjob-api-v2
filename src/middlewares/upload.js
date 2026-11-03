@@ -3,13 +3,11 @@ const path = require('path');
 const fs = require('fs');
 const InvariantError = require('../exceptions/InvariantError');
 
-// Ensure upload destination directory exists
 const uploadDir = path.resolve(__dirname, '../../uploads/documents');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Disk storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -21,7 +19,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter: accept only PDF documents
 const fileFilter = (req, file, cb) => {
   if (file.mimetype === 'application/pdf') {
     cb(null, true);
@@ -33,12 +30,11 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5 MB maximum file size
+    fileSize: 5 * 1024 * 1024,
   },
   fileFilter,
 });
 
-// Wrapper middleware to gracefully handle Multer errors
 const uploadDocumentMiddleware = (req, res, next) => {
   const uploadSingle = upload.single('document');
 

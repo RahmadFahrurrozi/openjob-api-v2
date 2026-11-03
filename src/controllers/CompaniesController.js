@@ -42,7 +42,6 @@ class CompaniesController {
       const { id } = req.params;
       const cacheKey = `companies:${id}`;
 
-      // Check cache first
       const cached = await this._cacheService.get(cacheKey);
       if (cached) {
         res.setHeader('X-Data-Source', 'cache');
@@ -52,7 +51,6 @@ class CompaniesController {
         });
       }
 
-      // If cache miss, fetch from database
       const company = await this._companiesService.getCompanyById(id);
       await this._cacheService.set(cacheKey, JSON.stringify(company), 3600);
 
@@ -71,7 +69,6 @@ class CompaniesController {
       const { id } = req.params;
       await this._companiesService.editCompanyById(id, req.body);
 
-      // Invalidate cache
       await this._cacheService.delete(`companies:${id}`);
 
       return res.status(200).json({
@@ -88,7 +85,6 @@ class CompaniesController {
       const { id } = req.params;
       await this._companiesService.deleteCompanyById(id);
 
-      // Invalidate cache
       await this._cacheService.delete(`companies:${id}`);
 
       return res.status(200).json({

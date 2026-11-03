@@ -19,7 +19,6 @@ class JobsService {
     status = 'open',
     user_id = null,
   }) {
-    // Check if company exists
     const companyCheck = await pool.query(
       'SELECT id FROM companies WHERE id = $1',
       [company_id]
@@ -28,7 +27,6 @@ class JobsService {
       throw new NotFoundError('Perusahaan tidak ditemukan');
     }
 
-    // Check if category exists
     const categoryCheck = await pool.query(
       'SELECT id FROM categories WHERE id = $1',
       [category_id]

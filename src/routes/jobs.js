@@ -9,7 +9,6 @@ const {
 const createJobsRouter = (jobsController, bookmarksController) => {
   const router = express.Router();
 
-  // Root collection
   router.get('/', jobsController.getJobsHandler);
   router.post(
     '/',
@@ -18,14 +17,12 @@ const createJobsRouter = (jobsController, bookmarksController) => {
     jobsController.postJobHandler
   );
 
-  // Sub-resource routes (Must be declared before /:id)
   router.get('/company/:companyId', jobsController.getJobsByCompanyIdHandler);
   router.get(
     '/category/:categoryId',
     jobsController.getJobsByCategoryIdHandler
   );
 
-  // Bookmark sub-routes for jobs
   router.post(
     '/:jobId/bookmark',
     authMiddleware,
@@ -42,7 +39,6 @@ const createJobsRouter = (jobsController, bookmarksController) => {
     bookmarksController.deleteBookmarkHandler
   );
 
-  // Single job resource
   router.get('/:id', jobsController.getJobByIdHandler);
   router.put(
     '/:id',
