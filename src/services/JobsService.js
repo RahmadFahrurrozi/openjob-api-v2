@@ -17,15 +17,22 @@ class JobsService {
     salary_max,
     is_salary_visible = true,
     status = 'open',
+    user_id = null,
   }) {
     // Check if company exists
-    const companyCheck = await pool.query('SELECT id FROM companies WHERE id = $1', [company_id]);
+    const companyCheck = await pool.query(
+      'SELECT id FROM companies WHERE id = $1',
+      [company_id]
+    );
     if (!companyCheck.rows.length) {
       throw new NotFoundError('Perusahaan tidak ditemukan');
     }
 
     // Check if category exists
-    const categoryCheck = await pool.query('SELECT id FROM categories WHERE id = $1', [category_id]);
+    const categoryCheck = await pool.query(
+      'SELECT id FROM categories WHERE id = $1',
+      [category_id]
+    );
     if (!categoryCheck.rows.length) {
       throw new NotFoundError('Kategori tidak ditemukan');
     }
@@ -36,8 +43,8 @@ class JobsService {
       text: `INSERT INTO jobs(
         id, company_id, category_id, title, description, job_type, 
         experience_level, location_type, location_city, salary_min, 
-        salary_max, is_salary_visible, status
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`,
+        salary_max, is_salary_visible, status, user_id
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`,
       values: [
         id,
         company_id,
@@ -52,6 +59,7 @@ class JobsService {
         salary_max !== undefined ? salary_max : null,
         is_salary_visible !== undefined ? is_salary_visible : true,
         status || 'open',
+        user_id || null,
       ],
     };
 
@@ -65,8 +73,18 @@ class JobsService {
   }
 
   async getJobs({ title, companyName } = {}) {
+    let selectFields = `
+      jobs.id, jobs.company_id, jobs.category_id, jobs.title, jobs.description,
+      jobs.job_type, jobs.experience_level, jobs.location_type, jobs.location_city,
+      jobs.salary_min, jobs.salary_max, jobs.is_salary_visible, jobs.status
+    `;
+
+    if (companyName && companyName.trim() !== '') {
+      selectFields += ', companies.name AS company_name';
+    }
+
     let baseQuery = `
-      SELECT jobs.*, companies.name AS company_name, categories.name AS category_name
+      SELECT ${selectFields}
       FROM jobs
       JOIN companies ON jobs.company_id = companies.id
       JOIN categories ON jobs.category_id = categories.id
@@ -153,17 +171,45 @@ class JobsService {
     const current = await this.getJobById(id);
 
     const updated = {
-      company_id: payload.company_id !== undefined ? payload.company_id : current.company_id,
-      category_id: payload.category_id !== undefined ? payload.category_id : current.category_id,
+      company_id:
+        payload.company_id !== undefined
+          ? payload.company_id
+          : current.company_id,
+      category_id:
+        payload.category_id !== undefined
+          ? payload.category_id
+          : current.category_id,
       title: payload.title !== undefined ? payload.title : current.title,
-      description: payload.description !== undefined ? payload.description : current.description,
-      job_type: payload.job_type !== undefined ? payload.job_type : current.job_type,
-      experience_level: payload.experience_level !== undefined ? payload.experience_level : current.experience_level,
-      location_type: payload.location_type !== undefined ? payload.location_type : current.location_type,
-      location_city: payload.location_city !== undefined ? payload.location_city : current.location_city,
-      salary_min: payload.salary_min !== undefined ? payload.salary_min : current.salary_min,
-      salary_max: payload.salary_max !== undefined ? payload.salary_max : current.salary_max,
-      is_salary_visible: payload.is_salary_visible !== undefined ? payload.is_salary_visible : current.is_salary_visible,
+      description:
+        payload.description !== undefined
+          ? payload.description
+          : current.description,
+      job_type:
+        payload.job_type !== undefined ? payload.job_type : current.job_type,
+      experience_level:
+        payload.experience_level !== undefined
+          ? payload.experience_level
+          : current.experience_level,
+      location_type:
+        payload.location_type !== undefined
+          ? payload.location_type
+          : current.location_type,
+      location_city:
+        payload.location_city !== undefined
+          ? payload.location_city
+          : current.location_city,
+      salary_min:
+        payload.salary_min !== undefined
+          ? payload.salary_min
+          : current.salary_min,
+      salary_max:
+        payload.salary_max !== undefined
+          ? payload.salary_max
+          : current.salary_max,
+      is_salary_visible:
+        payload.is_salary_visible !== undefined
+          ? payload.is_salary_visible
+          : current.is_salary_visible,
       status: payload.status !== undefined ? payload.status : current.status,
     };
 

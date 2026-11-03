@@ -1,7 +1,8 @@
 class ApplicationsController {
-  constructor(applicationsService, cacheService) {
+  constructor(applicationsService, cacheService, producerService) {
     this._applicationsService = applicationsService;
     this._cacheService = cacheService;
+    this._producerService = producerService;
 
     this.postApplicationHandler = this.postApplicationHandler.bind(this);
     this.getApplicationsHandler = this.getApplicationsHandler.bind(this);
@@ -18,7 +19,17 @@ class ApplicationsController {
 
   async postApplicationHandler(req, res, next) {
     try {
-      const id = await this._applicationsService.addApplication(req.body);
+      const application = await this._applicationsService.addApplication(
+        req.body
+      );
+
+      // Publish notification message to RabbitMQ asynchronously
+      if (this._producerService) {
+        await this._producerService.sendMessage(
+          'openjob:applications',
+          JSON.stringify({ application_id: application.id })
+        );
+      }
 
       // Invalidate list caches for user and job
       await this._cacheService.delete([
@@ -29,7 +40,12 @@ class ApplicationsController {
       return res.status(201).json({
         status: 'success',
         message: 'Lamaran berhasil diajukan',
-        data: { id },
+        data: {
+          id: application.id,
+          user_id: application.user_id,
+          job_id: application.job_id,
+          status: application.status,
+        },
       });
     } catch (error) {
       next(error);

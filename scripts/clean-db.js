@@ -3,7 +3,7 @@ const pool = require('../src/config/database');
 async function cleanDb() {
   try {
     await pool.query(
-      'TRUNCATE users, authentications, companies, categories, jobs, applications, bookmarks CASCADE'
+      'TRUNCATE users, authentications, companies, categories, jobs, applications, bookmarks, documents CASCADE'
     );
   } catch (error) {
     console.error('Failed to clean database:', error.message);

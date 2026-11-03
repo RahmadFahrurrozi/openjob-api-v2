@@ -12,6 +12,7 @@ const ApplicationsService = require('./services/ApplicationsService');
 const BookmarksService = require('./services/BookmarksService');
 const DocumentsService = require('./services/DocumentsService');
 const CacheService = require('./services/CacheService');
+const ProducerService = require('./services/ProducerService');
 
 // Controllers
 const UsersController = require('./controllers/UsersController');
@@ -50,8 +51,8 @@ const createApp = () => {
   const applicationsService = new ApplicationsService();
   const bookmarksService = new BookmarksService();
   const documentsService = new DocumentsService();
+  const producerService = new ProducerService();
 
-  // Instantiate controllers
   // Instantiate controllers
   const usersController = new UsersController(usersService, cacheService);
   const authenticationsController = new AuthenticationsController(
@@ -71,7 +72,8 @@ const createApp = () => {
   const jobsController = new JobsController(jobsService);
   const applicationsController = new ApplicationsController(
     applicationsService,
-    cacheService
+    cacheService,
+    producerService
   );
   const profileController = new ProfileController(
     usersService,

@@ -11,20 +11,45 @@ const createJobsRouter = (jobsController, bookmarksController) => {
 
   // Root collection
   router.get('/', jobsController.getJobsHandler);
-  router.post('/', authMiddleware, validatePayload(PostJobPayloadSchema), jobsController.postJobHandler);
+  router.post(
+    '/',
+    authMiddleware,
+    validatePayload(PostJobPayloadSchema),
+    jobsController.postJobHandler
+  );
 
   // Sub-resource routes (Must be declared before /:id)
   router.get('/company/:companyId', jobsController.getJobsByCompanyIdHandler);
-  router.get('/category/:categoryId', jobsController.getJobsByCategoryIdHandler);
+  router.get(
+    '/category/:categoryId',
+    jobsController.getJobsByCategoryIdHandler
+  );
 
   // Bookmark sub-routes for jobs
-  router.post('/:jobId/bookmark', authMiddleware, bookmarksController.postBookmarkHandler);
-  router.get('/:jobId/bookmark/:id', authMiddleware, bookmarksController.getBookmarkByIdHandler);
-  router.delete('/:jobId/bookmark', authMiddleware, bookmarksController.deleteBookmarkHandler);
+  router.post(
+    '/:jobId/bookmark',
+    authMiddleware,
+    bookmarksController.postBookmarkHandler
+  );
+  router.get(
+    '/:jobId/bookmark/:id',
+    authMiddleware,
+    bookmarksController.getBookmarkByIdHandler
+  );
+  router.delete(
+    '/:jobId/bookmark',
+    authMiddleware,
+    bookmarksController.deleteBookmarkHandler
+  );
 
   // Single job resource
   router.get('/:id', jobsController.getJobByIdHandler);
-  router.put('/:id', authMiddleware, validatePayload(PutJobPayloadSchema), jobsController.putJobByIdHandler);
+  router.put(
+    '/:id',
+    authMiddleware,
+    validatePayload(PutJobPayloadSchema),
+    jobsController.putJobByIdHandler
+  );
   router.delete('/:id', authMiddleware, jobsController.deleteJobByIdHandler);
 
   return router;

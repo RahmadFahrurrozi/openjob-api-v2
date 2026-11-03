@@ -5,7 +5,9 @@ const AuthenticationError = require('../exceptions/AuthenticationError');
 const TokenManager = {
   generateAccessToken: (payload) => {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_KEY, {
-      expiresIn: process.env.ACCESS_TOKEN_AGE ? parseInt(process.env.ACCESS_TOKEN_AGE, 10) : '3h',
+      expiresIn: process.env.ACCESS_TOKEN_AGE
+        ? parseInt(process.env.ACCESS_TOKEN_AGE, 10)
+        : '3h',
     });
   },
 
@@ -17,7 +19,7 @@ const TokenManager = {
     try {
       const artifacts = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY);
       return artifacts;
-    } catch (error) {
+    } catch {
       throw new InvariantError('Refresh token tidak valid');
     }
   },
@@ -26,7 +28,7 @@ const TokenManager = {
     try {
       const artifacts = jwt.verify(accessToken, process.env.ACCESS_TOKEN_KEY);
       return artifacts;
-    } catch (error) {
+    } catch {
       throw new AuthenticationError('Missing or invalid authentication token');
     }
   },

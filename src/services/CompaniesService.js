@@ -22,13 +22,15 @@ class CompaniesService {
   }
 
   async getCompanies() {
-    const result = await pool.query('SELECT id, name, location, description FROM companies ORDER BY created_at ASC');
+    const result = await pool.query(
+      'SELECT id, name, location, description, created_at, updated_at FROM companies ORDER BY created_at ASC'
+    );
     return result.rows;
   }
 
   async getCompanyById(id) {
     const query = {
-      text: 'SELECT id, name, location, description FROM companies WHERE id = $1',
+      text: 'SELECT id, name, location, description, created_at, updated_at FROM companies WHERE id = $1',
       values: [id],
     };
 
@@ -45,8 +47,10 @@ class CompaniesService {
     const current = await this.getCompanyById(id);
 
     const updatedName = name !== undefined ? name : current.name;
-    const updatedLocation = location !== undefined ? location : current.location;
-    const updatedDescription = description !== undefined ? description : current.description;
+    const updatedLocation =
+      location !== undefined ? location : current.location;
+    const updatedDescription =
+      description !== undefined ? description : current.description;
 
     const query = {
       text: 'UPDATE companies SET name = $1, location = $2, description = $3, updated_at = NOW() WHERE id = $4 RETURNING id',
@@ -56,7 +60,9 @@ class CompaniesService {
     const result = await pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Gagal memperbarui perusahaan. Id tidak ditemukan');
+      throw new NotFoundError(
+        'Gagal memperbarui perusahaan. Id tidak ditemukan'
+      );
     }
   }
 

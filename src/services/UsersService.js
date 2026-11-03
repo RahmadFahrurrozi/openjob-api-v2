@@ -35,7 +35,9 @@ class UsersService {
     const result = await pool.query(query);
 
     if (result.rows.length > 0) {
-      throw new InvariantError('Gagal menambahkan user. Email sudah digunakan.');
+      throw new InvariantError(
+        'Gagal menambahkan user. Email sudah digunakan.'
+      );
     }
   }
 

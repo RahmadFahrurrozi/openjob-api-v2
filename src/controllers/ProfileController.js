@@ -5,8 +5,10 @@ class ProfileController {
     this._bookmarksService = bookmarksService;
 
     this.getProfileHandler = this.getProfileHandler.bind(this);
-    this.getProfileApplicationsHandler = this.getProfileApplicationsHandler.bind(this);
-    this.getProfileBookmarksHandler = this.getProfileBookmarksHandler.bind(this);
+    this.getProfileApplicationsHandler =
+      this.getProfileApplicationsHandler.bind(this);
+    this.getProfileBookmarksHandler =
+      this.getProfileBookmarksHandler.bind(this);
   }
 
   async getProfileHandler(req, res, next) {
@@ -30,7 +32,8 @@ class ProfileController {
   async getProfileApplicationsHandler(req, res, next) {
     try {
       const { id } = req.user;
-      const applications = await this._applicationsService.getApplicationsByUserId(id);
+      const applications =
+        await this._applicationsService.getApplicationsByUserId(id);
       return res.status(200).json({
         status: 'success',
         data: { applications },

@@ -6,7 +6,9 @@ const NotFoundError = require('../exceptions/NotFoundError');
 class BookmarksService {
   async addBookmark(userId, jobId) {
     // Check if job exists
-    const jobCheck = await pool.query('SELECT id FROM jobs WHERE id = $1', [jobId]);
+    const jobCheck = await pool.query('SELECT id FROM jobs WHERE id = $1', [
+      jobId,
+    ]);
     if (!jobCheck.rows.length) {
       throw new NotFoundError('Job tidak ditemukan');
     }
@@ -40,7 +42,7 @@ class BookmarksService {
   async getBookmarksByUserId(userId) {
     const query = {
       text: `
-        SELECT bookmarks.*, jobs.title, jobs.company_id, companies.name AS company_name
+        SELECT bookmarks.*, jobs.*, companies.name AS company_name
         FROM bookmarks
         JOIN jobs ON bookmarks.job_id = jobs.id
         JOIN companies ON jobs.company_id = companies.id

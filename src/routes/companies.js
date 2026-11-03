@@ -11,9 +11,23 @@ const createCompaniesRouter = (companiesController) => {
 
   router.get('/', companiesController.getCompaniesHandler);
   router.get('/:id', companiesController.getCompanyByIdHandler);
-  router.post('/', authMiddleware, validatePayload(PostCompanyPayloadSchema), companiesController.postCompanyHandler);
-  router.put('/:id', authMiddleware, validatePayload(PutCompanyPayloadSchema), companiesController.putCompanyByIdHandler);
-  router.delete('/:id', authMiddleware, companiesController.deleteCompanyByIdHandler);
+  router.post(
+    '/',
+    authMiddleware,
+    validatePayload(PostCompanyPayloadSchema),
+    companiesController.postCompanyHandler
+  );
+  router.put(
+    '/:id',
+    authMiddleware,
+    validatePayload(PutCompanyPayloadSchema),
+    companiesController.putCompanyByIdHandler
+  );
+  router.delete(
+    '/:id',
+    authMiddleware,
+    companiesController.deleteCompanyByIdHandler
+  );
 
   return router;
 };

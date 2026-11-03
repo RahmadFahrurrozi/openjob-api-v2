@@ -34,4 +34,3 @@ const createDocumentsRouter = (documentsController) => {
 };
 
 module.exports = createDocumentsRouter;
-

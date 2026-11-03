@@ -11,9 +11,23 @@ const createCategoriesRouter = (categoriesController) => {
 
   router.get('/', categoriesController.getCategoriesHandler);
   router.get('/:id', categoriesController.getCategoryByIdHandler);
-  router.post('/', authMiddleware, validatePayload(PostCategoryPayloadSchema), categoriesController.postCategoryHandler);
-  router.put('/:id', authMiddleware, validatePayload(PutCategoryPayloadSchema), categoriesController.putCategoryByIdHandler);
-  router.delete('/:id', authMiddleware, categoriesController.deleteCategoryByIdHandler);
+  router.post(
+    '/',
+    authMiddleware,
+    validatePayload(PostCategoryPayloadSchema),
+    categoriesController.postCategoryHandler
+  );
+  router.put(
+    '/:id',
+    authMiddleware,
+    validatePayload(PutCategoryPayloadSchema),
+    categoriesController.putCategoryByIdHandler
+  );
+  router.delete(
+    '/:id',
+    authMiddleware,
+    categoriesController.deleteCategoryByIdHandler
+  );
 
   return router;
 };

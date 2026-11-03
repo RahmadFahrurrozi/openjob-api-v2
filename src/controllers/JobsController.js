@@ -6,14 +6,18 @@ class JobsController {
     this.getJobsHandler = this.getJobsHandler.bind(this);
     this.getJobByIdHandler = this.getJobByIdHandler.bind(this);
     this.getJobsByCompanyIdHandler = this.getJobsByCompanyIdHandler.bind(this);
-    this.getJobsByCategoryIdHandler = this.getJobsByCategoryIdHandler.bind(this);
+    this.getJobsByCategoryIdHandler =
+      this.getJobsByCategoryIdHandler.bind(this);
     this.putJobByIdHandler = this.putJobByIdHandler.bind(this);
     this.deleteJobByIdHandler = this.deleteJobByIdHandler.bind(this);
   }
 
   async postJobHandler(req, res, next) {
     try {
-      const id = await this._jobsService.addJob(req.body);
+      const id = await this._jobsService.addJob({
+        ...req.body,
+        user_id: req.user ? req.user.id : null,
+      });
       return res.status(201).json({
         status: 'success',
         message: 'Job berhasil ditambahkan',

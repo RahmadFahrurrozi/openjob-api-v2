@@ -77,6 +77,12 @@ npm run start:dev
 ```
 The server will be accessible at `http://localhost:3000`.
 
+### 7. Start the Background Consumer Worker
+In a separate terminal tab or window, launch the RabbitMQ background consumer worker to process asynchronous email notifications:
+```bash
+npm run start:consumer
+```
+
 ---
 
 ## Available NPM Scripts
@@ -85,13 +91,15 @@ The server will be accessible at `http://localhost:3000`.
 | :--- | :--- |
 | `npm start` | Runs the production server (`node src/server.js`) |
 | `npm run start:dev` | Runs the development server with live reload (`nodemon`) |
+| `npm run start:consumer` | Runs the background RabbitMQ consumer worker (`node src/consumer.js`) |
 | `npm run migrate:up` | Executes pending database migrations |
 | `npm run migrate:down` | Rolls back the last applied migration |
 | `npm run migrate:create <name>` | Creates a new migration file in `migrations/` |
 | `npm run lint` | Inspects codebase with ESLint for syntax and style issues |
 | `npm run lint:fix` | Automatically fixes ESLint-correctable issues |
 | `npm run format` | Formats code with Prettier across `src/` |
-| `npm test` | Cleans test database and executes Newman Postman tests |
+| `npm test` | Cleans test database and executes Newman Postman tests (V1) |
+| `npm run test:v2` | Cleans test database and executes all Postman V2 collection tests |
 
 ---
 

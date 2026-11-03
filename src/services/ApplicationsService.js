@@ -21,10 +21,19 @@ class ApplicationsService {
       throw new NotFoundError('Job tidak ditemukan');
     }
 
+    // Check for duplicate application
+    const existing = await pool.query(
+      'SELECT id FROM applications WHERE user_id = $1 AND job_id = $2',
+      [user_id, job_id]
+    );
+    if (existing.rows.length) {
+      throw new InvariantError('Lamaran sudah pernah diajukan sebelumnya');
+    }
+
     const id = `application-${nanoid(16)}`;
 
     const query = {
-      text: 'INSERT INTO applications(id, user_id, job_id, status) VALUES($1, $2, $3, $4) RETURNING id',
+      text: 'INSERT INTO applications(id, user_id, job_id, status) VALUES($1, $2, $3, $4) RETURNING id, user_id, job_id, status',
       values: [id, user_id, job_id, status || 'pending'],
     };
 
@@ -34,15 +43,29 @@ class ApplicationsService {
       throw new InvariantError('Lamaran gagal diajukan');
     }
 
-    return result.rows[0].id;
+    return result.rows[0];
   }
 
   async getApplications() {
     const query = `
-      SELECT applications.*, users.name AS user_name, users.email AS user_email, jobs.title AS job_title 
+      SELECT 
+        applications.id,
+        applications.user_id,
+        applications.job_id,
+        applications.status,
+        applications.created_at,
+        applications.updated_at,
+        users.name AS user_name,
+        users.email AS user_email,
+        jobs.title AS job_title,
+        jobs.company_id,
+        jobs.category_id,
+        companies.name AS company_name,
+        jobs.job_type
       FROM applications 
       JOIN users ON applications.user_id = users.id 
       JOIN jobs ON applications.job_id = jobs.id 
+      JOIN companies ON jobs.company_id = companies.id
       ORDER BY applications.created_at DESC
     `;
     const result = await pool.query(query);
@@ -73,9 +96,25 @@ class ApplicationsService {
   async getApplicationsByUserId(userId) {
     const query = {
       text: `
-        SELECT applications.*, jobs.title AS job_title
+        SELECT 
+          applications.id,
+          applications.user_id,
+          applications.job_id,
+          applications.status,
+          applications.created_at,
+          applications.updated_at,
+          jobs.title AS job_title,
+          jobs.description AS job_description,
+          jobs.job_type,
+          jobs.experience_level,
+          jobs.location_type,
+          jobs.location_city,
+          jobs.company_id,
+          jobs.category_id,
+          companies.name AS company_name
         FROM applications
         JOIN jobs ON applications.job_id = jobs.id
+        JOIN companies ON jobs.company_id = companies.id
         WHERE applications.user_id = $1
         ORDER BY applications.created_at DESC
       `,

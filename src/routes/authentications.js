@@ -10,9 +10,22 @@ const {
 const createAuthenticationsRouter = (authenticationsController) => {
   const router = express.Router();
 
-  router.post('/', validatePayload(PostAuthPayloadSchema), authenticationsController.postAuthenticationHandler);
-  router.put('/', validatePayload(PutAuthPayloadSchema), authenticationsController.putAuthenticationHandler);
-  router.delete('/', authMiddleware, validatePayload(DeleteAuthPayloadSchema), authenticationsController.deleteAuthenticationHandler);
+  router.post(
+    '/',
+    validatePayload(PostAuthPayloadSchema),
+    authenticationsController.postAuthenticationHandler
+  );
+  router.put(
+    '/',
+    validatePayload(PutAuthPayloadSchema),
+    authenticationsController.putAuthenticationHandler
+  );
+  router.delete(
+    '/',
+    authMiddleware,
+    validatePayload(DeleteAuthPayloadSchema),
+    authenticationsController.deleteAuthenticationHandler
+  );
 
   return router;
 };

@@ -22,7 +22,9 @@ class CategoriesService {
   }
 
   async getCategories() {
-    const result = await pool.query('SELECT id, name, description FROM categories ORDER BY created_at ASC');
+    const result = await pool.query(
+      'SELECT id, name, description, created_at FROM categories ORDER BY created_at ASC'
+    );
     return result.rows;
   }
 
@@ -45,7 +47,8 @@ class CategoriesService {
     const current = await this.getCategoryById(id);
 
     const updatedName = name !== undefined ? name : current.name;
-    const updatedDescription = description !== undefined ? description : current.description;
+    const updatedDescription =
+      description !== undefined ? description : current.description;
 
     const query = {
       text: 'UPDATE categories SET name = $1, description = $2, updated_at = NOW() WHERE id = $3 RETURNING id',
