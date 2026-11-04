@@ -1,0 +1,27 @@
+{
+  "name": "openjob-consumer",
+  "version": "1.0.0",
+  "description": "OpenJob RabbitMQ Consumer Application",
+  "main": "src/consumer.js",
+  "scripts": {
+    "start": "node src/consumer.js",
+    "start:dev": "nodemon src/consumer.js"
+  },
+  "keywords": [
+    "rabbitmq",
+    "consumer",
+    "nodemailer",
+    "dicoding"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^2.2.0",
+    "dotenv": "^16.4.7",
+    "nodemailer": "^10.3.1",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

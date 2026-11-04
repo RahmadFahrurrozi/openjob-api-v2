@@ -7,10 +7,12 @@ async function run() {
   execSync('node scripts/clean-db.js', { stdio: 'inherit' });
 
   console.log('Starting API server...');
-  const server = spawn('node', ['src/server.js'], { stdio: 'inherit' });
+  const server = spawn('node', ['src/server.js'], { stdio: 'inherit', shell: true });
+  server.on('error', (err) => console.error('Server process error:', err));
+  server.on('exit', (code, sig) => console.log(`Server exited with code ${code}, signal ${sig}`));
 
   // Wait for server to start listening
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise(resolve => setTimeout(resolve, 3000));
 
   const collectionPath = path.resolve('OpenJob RESTful API V2 Test/[271] OpenJob API Test V2.postman_collection.json');
   const environmentPath = path.resolve('OpenJob RESTful API V2 Test/OpenJob API.postman_environment.json');

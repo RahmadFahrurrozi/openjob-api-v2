@@ -38,7 +38,6 @@ async function init() {
       const { application_id } = content;
 
       if (!application_id) {
-        console.warn('Received message without application_id. Skipping.');
         channel.ack(message);
         return;
       }
@@ -67,9 +66,6 @@ async function init() {
       const result = await pool.query(query);
 
       if (!result.rows.length) {
-        console.warn(
-          `Application with ID ${application_id} not found in database.`
-        );
         channel.ack(message);
         return;
       }
@@ -92,7 +88,6 @@ async function init() {
       }
 
       if (!ownerEmail) {
-        console.warn('No dynamic job owner email found in database.');
         channel.ack(message);
         return;
       }
@@ -119,7 +114,7 @@ async function init() {
       try {
         const info = await transporter.sendMail(mailOptions);
         console.log(
-          `Notification email successfully sent to Job Owner (${ownerEmail}). MessageId: ${info.messageId}`
+          `Notification email sent to Job Owner (${ownerEmail}). MessageId: ${info.messageId}`
         );
       } catch (mailError) {
         console.error(
@@ -136,7 +131,6 @@ async function init() {
   });
 
   const handleShutdown = async () => {
-    console.log('Shutting down consumer gracefully...');
     await channel.close();
     await connection.close();
     process.exit(0);
