@@ -11,7 +11,6 @@ async function run() {
   server.on('error', (err) => console.error('Server process error:', err));
   server.on('exit', (code, sig) => console.log(`Server exited with code ${code}, signal ${sig}`));
 
-  // Wait for server to start listening
   await new Promise(resolve => setTimeout(resolve, 3000));
 
   const collectionPath = path.resolve('OpenJob RESTful API V2 Test/[271] OpenJob API Test V2.postman_collection.json');
@@ -20,7 +19,6 @@ async function run() {
   const collection = require(collectionPath);
   const environment = require(environmentPath);
 
-  // Exclude [Mandatory] Documents as instructed by Dicoding
   const runnableItems = collection.item.filter(item => item.name !== '[Mandatory] Documents');
   const runnableCollection = { ...collection, item: runnableItems };
 

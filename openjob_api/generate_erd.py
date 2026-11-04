@@ -7,11 +7,9 @@ def create_erd():
     image = Image.new("RGBA", (width, height), (248, 250, 252, 255))
     draw = ImageDraw.Draw(image)
 
-    # Title Banner
     draw.rectangle([(0, 0), (width, 80)], fill=(30, 41, 59))
     draw.text((40, 25), "ENTITY RELATIONSHIP DIAGRAM (ERD) - OPENJOB RESTFUL API VERSI 1", fill=(255, 255, 255))
 
-    # Tables specification: (name, x, y, w, header_color, columns: [(name, type, tag)])
     tables = [
         {
             "name": "users",
@@ -108,23 +106,19 @@ def create_erd():
         },
     ]
 
-    # Draw tables
     for tbl in tables:
         x, y, w = tbl["x"], tbl["y"], tbl["w"]
         row_h = 24
         header_h = 32
         total_h = header_h + len(tbl["columns"]) * row_h + 8
 
-        # Box shadow & background
         draw.rounded_rectangle([(x+4, y+4), (x+w+4, y+total_h+4)], radius=8, fill=(226, 232, 240, 180))
         draw.rounded_rectangle([(x, y), (x+w, y+total_h)], radius=8, fill=(255, 255, 255), outline=(203, 213, 225), width=2)
         
-        # Header
         draw.rounded_rectangle([(x, y), (x+w, y+header_h)], radius=8, fill=tbl["header"])
         draw.rectangle([(x, y+header_h-8), (x+w, y+header_h)], fill=tbl["header"])
         draw.text((x+15, y+8), tbl["name"].upper(), fill=(255, 255, 255))
 
-        # Rows
         cur_y = y + header_h + 6
         for col_name, col_type, tag in tbl["columns"]:
             draw.text((x+15, cur_y), col_name, fill=(15, 23, 42))
@@ -135,28 +129,21 @@ def create_erd():
                 draw.text((x+w-32, cur_y), tag, fill=(255, 255, 255))
             cur_y += row_h
 
-    # Draw Relation Connectors
-    # 1. companies -> jobs
     draw.line([(1240, 180), (970, 180)], fill=(71, 85, 105), width=3)
     draw.text((1080, 160), "1:N (company_id)", fill=(51, 65, 85))
 
-    # 2. categories -> jobs
     draw.line([(1240, 460), (1050, 460), (1050, 220), (970, 220)], fill=(71, 85, 105), width=3)
     draw.text((1060, 320), "1:N (category_id)", fill=(51, 65, 85))
 
-    # 3. users -> applications
     draw.line([(210, 330), (210, 660)], fill=(71, 85, 105), width=3)
     draw.text((120, 520), "1:N (user_id)", fill=(51, 65, 85))
 
-    # 4. jobs -> applications
     draw.line([(700, 530), (700, 600), (450, 600), (450, 660)], fill=(71, 85, 105), width=3)
     draw.text((540, 580), "1:N (job_id)", fill=(51, 65, 85))
 
-    # 5. users -> bookmarks
     draw.line([(360, 280), (580, 280), (580, 720), (780, 720)], fill=(71, 85, 105), width=3)
     draw.text((590, 700), "1:N (user_id)", fill=(51, 65, 85))
 
-    # 6. jobs -> bookmarks
     draw.line([(850, 530), (850, 660)], fill=(71, 85, 105), width=3)
     draw.text((860, 580), "1:N (job_id)", fill=(51, 65, 85))
 

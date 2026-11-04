@@ -144,3 +144,4 @@ init().catch((err) => {
   console.error('Failed to start consumer worker:', err);
   process.exit(1);
 });
+
